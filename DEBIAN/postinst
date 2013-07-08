@@ -1,0 +1,7 @@
+#!/bin/bash
+
+SOLR_USER=tomcat6
+SOLR_ROOT=/var/solr
+
+# grant jetty directories to jetty user
+chown ${SOLR_USER}:${SOLR_USER} -R ${SOLR_ROOT}
