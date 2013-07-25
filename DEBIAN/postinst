@@ -4,6 +4,7 @@ SOLR_USER=tomcat6
 SOLR_ROOT=/var/solr
 SOLR_CONFIG=${SOLR_ROOT}/home/solr.xml
 
+#optionally deploy solr.xml
 if [ ! -e "$SOLR_CONFIG" ]; then
 	cp /var/solr/debian/solr.xml ${SOLR_CONFIG}
 fi
