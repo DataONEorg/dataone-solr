@@ -11,3 +11,5 @@ fi
 
 # grant jetty directories to jetty user
 chown ${SOLR_USER}:${SOLR_USER} -R ${SOLR_ROOT}
+
+exit 0

@@ -4,3 +4,5 @@ rm -rf /var/solr/contrib
 rm -rf /var/solr/dist
 rm -rf /var/solr/example
 rm -rf /var/solr/licenses
+
+exit 0
