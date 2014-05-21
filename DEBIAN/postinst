@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SOLR_USER=tomcat6
+SOLR_USER=tomcat7
 SOLR_ROOT=/var/solr
 SOLR_CONFIG=${SOLR_ROOT}/home/solr.xml
 
