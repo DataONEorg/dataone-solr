@@ -6,4 +6,4 @@ Architecture: all
 Depends: openjdk-7-jdk
 Installed-Size: 1 kb
 Maintainer: Skye Roseboom <sroseboo@dataone.unm.edu>
-Description: This is a metapackage that installs the apache lucene solr product.  Currently installs apache solr 4.9.0
+Description: This is a metapackage that installs the apache lucene solr product.  Currently installs apache solr 4.10.3
