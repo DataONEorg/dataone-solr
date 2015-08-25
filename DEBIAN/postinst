@@ -4,12 +4,9 @@ SOLR_USER=tomcat7
 SOLR_ROOT=/var/solr
 SOLR_CONFIG=${SOLR_ROOT}/server/solr/solr.xml
 
-#optionally deploy solr.xml
-#if [ ! -e "$SOLR_CONFIG" ]; then
-#	cp /var/solr/debian/solr.xml ${SOLR_CONFIG}
-#fi
-
 # grant jetty directories to jetty user
 chown ${SOLR_USER}:${SOLR_USER} -R ${SOLR_ROOT}
+
+
 
 exit 0
