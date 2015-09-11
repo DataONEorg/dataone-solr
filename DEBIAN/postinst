@@ -1,12 +1,127 @@
 #!/bin/bash
 
+set -e
+
+LONG_DATE=`date +%Y%m%d%H%M%S`
+
+if [ -e "/usr/share/debconf/confmodule" ]; then
+    . /usr/share/debconf/confmodule
+else
+    echo "debconf must be installed. Exiting."
+    exit 1
+fi
+
+D1_LOG_DIR=/var/log/dataone
+D1_LOG_FILE=dataone-solr.install.log
+
+function log() 
+{
+	#
+	# Set Up logging
+	# Reminder: don't echo to stdout, it messes up debconf
+	#
+    if [ ! -e ${D1_LOG_DIR} ]; then
+        mkdir -p ${D1_LOG_DIR}
+        chown tomcat7:tomcat7 ${D1_LOG_DIR}
+    fi
+    now=$(date "+%Y-%m-%d %H:%M:%S %Z: ")
+    echo -e "${now} postinst $@" >> ${D1_LOG_DIR}/${D1_LOG_FILE}
+}
+
 SOLR_USER=tomcat7
 SOLR_ROOT=/var/solr
-SOLR_CONFIG=${SOLR_ROOT}/server/solr/solr.xml
 
-# grant jetty directories to jetty user
-chown ${SOLR_USER}:${SOLR_USER} -R ${SOLR_ROOT}
+SOLR_SERVER_PORT=8983
+ZK_CLIENT_PORT=2181
+
+# Substitution tokens used in config files solr.in.sh
+SERVER_1_TOKEN="D1_CN_IP_1"
+SERVER_2_TOKEN="D1_CN_IP_2"
+SERVER_3_TOKEN="D1_CN_IP_3"
+ZK_CLIENT_PORT_TOKEN="D1_ZK_CLIENT_PORT"
+
+log "start"
+
+if ! (/etc/init.d/solr stop >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+	log "solr refused to stop"
+fi
+
+## Deploy and configure files that need variable subsitution
+##### Parse node.properties to derive CN IP list.
+db_get dataone-cn-os-core/cn.iplist
+IP_LIST=(${RET})
+
+SERVER_1=${IP_LIST[0]}
+SERVER_2=${IP_LIST[1]}
+SERVER_3=${IP_LIST[2]}
+
+##### Use hostname command to derive local IP, used to set zookeeper server myid file.
+MY_POSSIBLE_IPS=(`hostname --all-ip-addresses`)
+for i in ${MY_POSSIBLE_IPS[@]}
+do
+	if [[ "${IP_LIST[@]}" =~ "${i}" ]]; then
+		LOCAL_IP=${i}
+	fi
+done
+
+cp /usr/share/dataone-solr/debian/server_configs/solr.in.sh ${SOLR_ROOT}/
+cp /usr/share/dataone-solr/debian/server_configs/solr /etc/init.d/
+
+chmod 755 /etc/init.d/solr
+update-rc.d solr defaults
+update-rc.d solr enable
+
+##### Configure solr.in.sh with server configuration
+if ! (sed -i "s/$SERVER_1_TOKEN/$SERVER_1/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+	log "Unable to modify ${SOLR_ROOT}/solr.in.sh for $SERVER_1_TOKEN $SERVER_1"
+fi
+
+if [ -z "$SERVER_2" ]; then
+	if ! (sed -i "s/$SERVER_2_TOKEN/$SERVER_2/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+		log "Unable to modify ${SOLR_ROOT}/solr.in.sh for $SERVER_2_TOKEN $SERVER_2"
+	fi
+fi
+
+if [ -z "$SERVER_3" ]; then
+	if ! (sed -i "s/$SERVER_3_TOKEN/$SERVER_3/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+		log "Unable to modify ${SOLR_ROOT}/start.in.sh for server $SERVER_3_TOKEN $SERVER_3"
+	fi
+fi
+
+if ! (sed -i "s/$ZK_CLIENT_PORT_TOKEN/$ZK_CLIENT_PORT/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+	log "Unable to modify ${SOLR_ROOT}/start.in.sh for $ZK_CLIENT_PORT_TOKEN $ZK_CLIENT_PORT"
+fi
 
 
+### Firewall configuration to allow solr communication
+if ! (ufw allow from $SERVER_1 to any port $SOLR_SERVER_PORT >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+	log "Unable to open ufw port $SOLR_SERVER_PORT for $SERVER_1 "
+fi
+if ! (ufw allow from $SERVER_2 to any port $SOLR_SERVER_PORT >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+	log "Unable to open ufw port $SOLR_SERVER_PORT for $SERVER_2 "
+fi
+if ! (ufw allow from $SERVER_3 to any port $SOLR_SERVER_PORT >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+	log "Unable to open ufw port $SOLR_SERVER_PORT for $SERVER_3 "
+fi
 
+##### Configure log output directory if not there
+if [ ! -d /var/log/dataone/cn ]
+then
+	if (mkdir /var/log/dataone/cn >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1 ); then
+    log "mkdir /var/log/dataone/cn succeeded"
+    fi
+fi
+
+if (chown -R ${SOLR_USER}:${SOLR_USER} /var/log/dataone/cn >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1 ); then
+    log "chown -R ${SOLR_USER}:${SOLR_USER} /var/log/dataone/cn succeeded"
+fi
+######
+
+
+# grant solr directories to solr user
+chown -R ${SOLR_USER}:${SOLR_USER} ${SOLR_ROOT}
+
+/etc/init.d/solr start
+
+db_stop
 exit 0
