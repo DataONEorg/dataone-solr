@@ -76,16 +76,12 @@ if ! (sed -i "s/$SERVER_1_TOKEN/$SERVER_1/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG
 	log "Unable to modify ${SOLR_ROOT}/solr.in.sh for $SERVER_1_TOKEN $SERVER_1"
 fi
 
-if [ -z "$SERVER_2" ]; then
-	if ! (sed -i "s/$SERVER_2_TOKEN/$SERVER_2/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
-		log "Unable to modify ${SOLR_ROOT}/solr.in.sh for $SERVER_2_TOKEN $SERVER_2"
-	fi
+if ! (sed -i "s/$SERVER_2_TOKEN/$SERVER_2/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+	log "Unable to modify ${SOLR_ROOT}/solr.in.sh for $SERVER_2_TOKEN $SERVER_2"
 fi
 
-if [ -z "$SERVER_3" ]; then
-	if ! (sed -i "s/$SERVER_3_TOKEN/$SERVER_3/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
-		log "Unable to modify ${SOLR_ROOT}/start.in.sh for server $SERVER_3_TOKEN $SERVER_3"
-	fi
+if ! (sed -i "s/$SERVER_3_TOKEN/$SERVER_3/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
+	log "Unable to modify ${SOLR_ROOT}/start.in.sh for server $SERVER_3_TOKEN $SERVER_3"
 fi
 
 if ! (sed -i "s/$ZK_CLIENT_PORT_TOKEN/$ZK_CLIENT_PORT/g" ${SOLR_ROOT}/solr.in.sh >> ${D1_LOG_DIR}/${D1_LOG_FILE} 2>&1); then
