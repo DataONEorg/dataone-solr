@@ -1,5 +1,10 @@
 #!/bin/bash
 
+/etc/init.d/solr stop
+
+update-rc.d -f solr remove
+rm -f /etc/init.d/solr
+
 rm -rf /var/solr/contrib
 rm -rf /var/solr/dist
 rm -rf /var/solr/example
