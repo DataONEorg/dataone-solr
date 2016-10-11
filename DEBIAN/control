@@ -3,7 +3,7 @@ Version: 2.3.0
 Section: utils
 Priority: optional
 Architecture: all
-Depends: openjdk-7-jdk
+Depends: openjdk-8-jdk
 Installed-Size: 1 kb
 Maintainer: Skye Roseboom <sroseboo@dataone.unm.edu>
 Description: This is a metapackage that installs the apache lucene solr product.  Currently installs apache solr 5.2.1
