@@ -1,5 +1,5 @@
 Package: dataone-solr
-Version: 2.3.1
+Version: 2.3.2
 Section: utils
 Priority: optional
 Architecture: all
