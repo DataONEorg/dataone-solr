@@ -11,6 +11,10 @@ else
     exit 1
 fi
 
+
+SOLR_USER=tomcat
+SOLR_ROOT=/var/solr
+
 D1_LOG_DIR=/var/log/dataone
 D1_LOG_FILE=dataone-solr.install.log
 
@@ -22,14 +26,11 @@ function log()
 	#
     if [ ! -e ${D1_LOG_DIR} ]; then
         mkdir -p ${D1_LOG_DIR}
-        chown tomcat8:tomcat8 ${D1_LOG_DIR}
+        chown ${SOLR_USER}:${SOLR_USER} ${D1_LOG_DIR}
     fi
     now=$(date "+%Y-%m-%d %H:%M:%S %Z: ")
     echo -e "${now} postinst $@" >> ${D1_LOG_DIR}/${D1_LOG_FILE}
 }
-
-SOLR_USER=tomcat8
-SOLR_ROOT=/var/solr
 
 SOLR_SERVER_PORT=8983
 ZK_CLIENT_PORT=2181
