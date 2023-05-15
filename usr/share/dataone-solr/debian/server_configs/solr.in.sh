@@ -48,7 +48,7 @@ GC_TUNE="-XX:NewRatio=3 \
 # Set the ZooKeeper connection string if using an external ZooKeeper ensemble
 # e.g. host1:2181,host2:2181/chroot
 # Leave empty if not using SolrCloud
-ZK_HOST="D1_CN_IP_1:D1_ZK_CLIENT_PORT,D1_CN_IP_2:D1_ZK_CLIENT_PORT,D1_CN_IP_3:D1_ZK_CLIENT_PORT"
+ZK_HOST="D1_CN_IP_1:D1_ZK_CLIENT_PORT,D1_CN_IP_2:D1_ZK_CLIENT_PORT"
 
 # Set the ZooKeeper client timeout (for SolrCloud mode)
 #ZK_CLIENT_TIMEOUT="15000"
